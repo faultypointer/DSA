@@ -4,4 +4,4 @@ This repo servers as a collection of notes, assignments, codes and various other
 
 ## Courses
 
-- [Introduction to Algorithms](./intro-to-algo-mit/intro-to-algo-mit.md)
+- [Introduction to Algorithms](./intro-to-algo-mit/README.md)
