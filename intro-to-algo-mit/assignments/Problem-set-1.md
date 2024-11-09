@@ -344,3 +344,7 @@ def algorithm4(problem, bestSeen = None, rowSplit = True, trace = None):
     result = algorithm4(sub, newBest, not rowSplit, trace)
     return problem.getLocationInSelf(sub, result)
 ```
+
+## Problem 1-3 Peak Finding Correctness
+
+### Is `algorithm1` correct?
