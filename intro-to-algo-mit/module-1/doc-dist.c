@@ -1,5 +1,6 @@
 #include "test.h"
 #include <errno.h>
+#include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -236,8 +237,11 @@ int read_file(FILE **fp1, FILE **fp2, char *filenames[2]) {
   return 0;
 }
 
+// Reads a file in chunks and tokenizes the text to count word frequencies,
+// storing results in a hashmap.
+// only ascii alphanumeric characters are considered for words
+// uppercase characters are converted to lowercase characters
 void vectorize(FILE *fp, HashMap *map) {
-
   size_t buf_len = 100000;
   char buf[buf_len];
   int byte_read = 0;
@@ -265,6 +269,41 @@ void vectorize(FILE *fp, HashMap *map) {
   } while (byte_read == buf_len);
 }
 
+// calculates the dot product of two document vectors
+uint64_t dot_product(HashMap *vec1, HashMap *vec2) {
+  uint64_t result = 0;
+  for (int i = 0; i < vec1->capacity; i++) {
+    HashNode *node1 = vec1->buckets[i];
+    while (node1 != NULL) {
+      HashNode *node2 = hm_get_node(vec2, node1->key);
+      if (node2 != NULL) {
+        result += (uint64_t)node1->value * node2->value;
+      }
+      node1 = node1->next;
+    }
+  }
+  return result;
+}
+
+uint64_t vector_length(HashMap *vec) {
+  uint64_t result = 0;
+  for (int i = 0; i < vec->capacity; i++) {
+    HashNode *node = vec->buckets[i];
+    while (node != NULL) {
+      result += node->value * node->value;
+      node = node->next;
+    }
+  }
+  return result;
+}
+
+double cosine_distance(HashMap *vec1, HashMap *vec2) {
+  double dot = (double)dot_product(vec1, vec2);
+  double length_product =
+      sqrt((double)vector_length(vec1) * vector_length(vec2));
+  return acos(dot / length_product);
+}
+
 // ================================================================
 
 int main(int argc, char *argv[]) {
@@ -281,10 +320,19 @@ int main(int argc, char *argv[]) {
   }
 
   HashMap *vector_one = hm_init_with_capacity(512);
+  HashMap *vector_two = hm_init_with_capacity(512);
   vectorize(fp1, vector_one);
-  printf("total unique words: %ld", vector_one->size);
+  vectorize(fp2, vector_two);
+  fclose(fp1);
+  fclose(fp2);
+  printf("[File %s]: %ld distinct words\n", argv[1], vector_one->size);
+  printf("[File %s]: %ld distinct words\n", argv[2], vector_two->size);
+
+  printf("Distance between documents: %f(radians)\n",
+         cosine_distance(vector_one, vector_two));
 
   // free hashmaps
   hm_deinit(vector_one);
+  hm_deinit(vector_two);
   return 0;
 }
