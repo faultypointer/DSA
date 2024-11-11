@@ -4,7 +4,13 @@
 
 ## Notes
 
-- [Algorithmic Thinking, Peak Finding](./module-1/Lecture_Note.md)
+- [Algorithmic Thinking, Peak Finding](./module-1/Lecture_1_Note.md)
+- [Model of Computation, Document Distance](./module-1/Lecture_2_Note.md)
+
+## Codes
+
+- [Peak Finding - one dimention](./module-1/peak.c)
+- [Document Distance](./module-1/doc-dist.c)
 
 ## Assignments
 
